@@ -2,14 +2,13 @@ NAME = ft_ls
 
 LIBFT = libft
 
-SRC = main.c
+SRC = ft_ls.c
 OBJ = $(SRC:.c=.o)
 CFLAGS = -Wextra -Wall
 INCLUDES = $(LIBFT)
 LIBFLAGS = -L$(LIBFT) -lft
 
 all: $(NAME)
-	@./$(NAME)
 
 $(NAME): $(OBJ)
 	$(MAKE) -sC $(LIBFT)
