@@ -8,14 +8,15 @@ CFLAGS = -Wextra -Wall
 INCLUDES = $(LIBFT)
 LIBFLAGS = -L$(LIBFT) -lft
 
+all: $(NAME)
+	@./$(NAME)
+
 $(NAME): $(OBJ)
 	$(MAKE) -sC $(LIBFT)
 	$(CC) -o $(NAME) $(OBJ) $(LIBFLAGS)
 	
 %.o: %.c
 	$(CC) $(CFLAGS) -I $(INCLUDES) -c $< -o $@
-
-all: $(NAME)
 
 clean:
 	$(MAKE) -sC $(LIBFT) clean
