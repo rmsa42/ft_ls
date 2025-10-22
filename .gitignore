@@ -1,5 +1,6 @@
 ft_ls
 *.o
+*.a
 
 # Clangd
 .cache/
