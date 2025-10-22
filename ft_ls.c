@@ -27,8 +27,8 @@ int ft_ls(char *dir_pathname) {
 	DIR *dirp;
 	char *dirs_path[50] = {0};
 	struct dirent *dir = NULL;
+	struct stat buf;
 
-	char *dir_abs_path = ft_strjoin(dir_pathname, "/");
 	dirp = opendir(dir_pathname);
 	if (dirp == NULL) {
 		perror(dir_pathname);
@@ -38,19 +38,20 @@ int ft_ls(char *dir_pathname) {
 	ft_printf("%s:\n", dir_pathname);
 
 	int nbr_dirs = 0;
+	char *dir_slashed_path = ft_strjoin(dir_pathname, "/");
 	while ((dir = readdir(dirp)) != NULL) {
-		char *abs_path = ft_strjoin(dir_abs_path, dir->d_name);
-		if (options.all == false && !ft_strncmp(dir->d_name, ".", 1)) {
+		char *file_rel_path = ft_strjoin(dir_slashed_path, dir->d_name);
+		stat(file_rel_path, &buf);
+		if (options.all == false && dir->d_name[0] == '.') {
+			free(file_rel_path);
 			continue;
-		}
-		struct stat buf;
-		stat(abs_path, &buf);
-		if (S_ISDIR(buf.st_mode)) {
-			dirs_path[nbr_dirs++] = abs_path;
+		} else if (S_ISDIR(buf.st_mode)) {
+			dirs_path[nbr_dirs++] = ft_strdup(file_rel_path);
 		}
 		ft_printf("%s ", dir->d_name);
+		free(file_rel_path);
 	}
-	ft_printf("\n\n");
+	ft_printf("\n");
 
 	#if DEBUG
 	ft_printf("Closing Dir\n");
@@ -61,14 +62,20 @@ int ft_ls(char *dir_pathname) {
 	}
 	#endif
 	closedir(dirp);
+	free(dir_slashed_path);
+	ft_printf("\n");
 
 	if (options.recursive == true) {
 		for (int i = 0; i < nbr_dirs; i++) {
 			ft_ls(dirs_path[i]);
+			free(dirs_path[i]);
+		}
+	} else {
+		for (int i = 0; i < nbr_dirs; i++) {
+			free(dirs_path[i]);
 		}
 	}
 
-	free(dir_abs_path);
 	return (0);
 }
 

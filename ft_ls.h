@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <linux/limits.h>
 
 struct options {
 	bool all;
