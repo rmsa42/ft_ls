@@ -7,6 +7,8 @@ OBJ = $(SRC:.c=.o)
 CFLAGS = -Wextra -Wall
 INCLUDES = $(LIBFT)
 LIBFLAGS = -L$(LIBFT) -lft
+DEBUG ?= 0
+DEBUG_FLAG = -DDEBUG
 
 all: $(NAME)
 
@@ -15,7 +17,7 @@ $(NAME): $(OBJ)
 	$(CC) -o $(NAME) $(OBJ) $(LIBFLAGS)
 	
 %.o: %.c
-	$(CC) $(CFLAGS) -I $(INCLUDES) -c $< -o $@
+	$(CC) $(DEBUG_FLAG)=$(DEBUG) $(CFLAGS) -I $(INCLUDES) -c $< -o $@
 
 clean:
 	$(MAKE) -sC $(LIBFT) clean

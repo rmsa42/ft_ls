@@ -35,9 +35,7 @@ int ft_ls(char *dir_pathname) {
 		return (1);
 	}
 
-	#if DEBUG == 1
-	ft_printf("Opened Dir %s\n", dir_pathname);
-	#endif
+	ft_printf("%s:\n", dir_pathname);
 
 	int nbr_dirs = 0;
 	while ((dir = readdir(dirp)) != NULL) {
@@ -52,9 +50,9 @@ int ft_ls(char *dir_pathname) {
 		}
 		ft_printf("%s ", dir->d_name);
 	}
-	ft_printf("\n");
+	ft_printf("\n\n");
 
-	#if DEBUG == 1
+	#if DEBUG
 	ft_printf("Closing Dir\n");
 	ft_printf("Nbr of dirs: %d\n", nbr_dirs);
 	ft_printf("More Dirs: ");
@@ -80,7 +78,6 @@ int main(int argc, char **argv) {
 
 	for (int i = 1; i < argc; i++) {
 		char *arg = argv[i];
-		ft_printf("Arg: %s\n", arg);
 		if (arg[0] == '-' && arg[1]) {
 			parser_options(arg);
 		} else {
@@ -91,7 +88,7 @@ int main(int argc, char **argv) {
 		dir_paths[nbr_dirs++] = ".";
 	}
 
-	#if DEBUG == 1
+	#if DEBUG
 	ft_printf("DEBUG Log\n");
 	ft_printf("  Active Options:\n");
 	ft_printf("\tall: %d\n\treverse: %d\n\trecursive: %d\n", options.all, options.reverse, options.recursive);
@@ -99,7 +96,7 @@ int main(int argc, char **argv) {
 	#endif
 
 	for (int i = 0; i < nbr_dirs; i++) {
-		ft_printf("Exit Status %d\n\n", ft_ls(dir_paths[i]));
+		ft_ls(dir_paths[i]);
 	}
 	return (0);
 }

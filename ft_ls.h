@@ -5,8 +5,6 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-#define DEBUG 1
-
 struct options {
 	bool all;
 	bool reverse;
