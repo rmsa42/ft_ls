@@ -2,6 +2,25 @@
 #include "ft_ls.h"
 
 struct options options;
+t_list *entries = NULL;
+
+struct file *file_constructor(char *name, unsigned short size) {
+	struct file *file = ft_calloc(1, sizeof(struct file));
+	
+	file->name = name;
+	file->size = size;
+	return (file);
+}
+
+void print_dir(t_list *entries, char *dir_pathname) {
+	ft_printf("%s:\n", dir_pathname);
+	while (entries != NULL) {
+		struct file *file = ((struct file *)entries->content);
+		ft_printf("%s ", file->name);
+		entries = entries->next;
+	}
+	ft_printf("\n");
+}
 
 int parser_options(char *option) {
 	for (int i = 1; option[i] != '\0'; i++) {
@@ -35,9 +54,8 @@ int ft_ls(char *dir_pathname) {
 		return (1);
 	}
 
-	ft_printf("%s:\n", dir_pathname);
-
 	int nbr_dirs = 0;
+	t_list **tmp = &entries;
 	char *dir_slashed_path = ft_strjoin(dir_pathname, "/");
 	while ((dir = readdir(dirp)) != NULL) {
 		char *file_rel_path = ft_strjoin(dir_slashed_path, dir->d_name);
@@ -48,10 +66,13 @@ int ft_ls(char *dir_pathname) {
 		} else if (S_ISDIR(buf.st_mode)) {
 			dirs_path[nbr_dirs++] = ft_strdup(file_rel_path);
 		}
-		ft_printf("%s ", dir->d_name);
+		struct file *file = file_constructor(dir->d_name, 10);
+		*tmp = ft_lstnew((void *)file);
+		tmp = &((*tmp)->next);
 		free(file_rel_path);
 	}
-	ft_printf("\n");
+
+	print_dir(entries, dir_pathname);
 
 	#if DEBUG
 	ft_printf("Closing Dir\n");
