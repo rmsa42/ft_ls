@@ -12,4 +12,9 @@ struct options {
 	bool recursive;
 };
 
+struct file {
+	const char *name;
+	struct stat stat;
+};
+
 #endif

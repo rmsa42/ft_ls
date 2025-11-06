@@ -3,6 +3,18 @@
 
 struct options options;
 
+struct file *file_constructor(const char *file_name, const char *file_rel_path) {
+	struct file *file = ft_calloc(1, sizeof(struct file));
+	
+	file->name = file_name;
+	stat(file_rel_path, &file->stat);
+	return (file);
+}
+
+void print_file(struct file *file) {
+	ft_printf("%s ", file->name);
+}
+
 int parser_options(char *option) {
 	for (int i = 1; option[i] != '\0'; i++) {
 		switch (option[i]) {
@@ -27,7 +39,6 @@ int ft_ls(char *dir_pathname) {
 	DIR *dirp;
 	char *dirs_path[50] = {0};
 	struct dirent *dir = NULL;
-	struct stat buf;
 
 	dirp = opendir(dir_pathname);
 	if (dirp == NULL) {
@@ -40,15 +51,15 @@ int ft_ls(char *dir_pathname) {
 	int nbr_dirs = 0;
 	char *dir_slashed_path = ft_strjoin(dir_pathname, "/");
 	while ((dir = readdir(dirp)) != NULL) {
-		char *file_rel_path = ft_strjoin(dir_slashed_path, dir->d_name);
-		stat(file_rel_path, &buf);
 		if (options.all == false && dir->d_name[0] == '.') {
-			free(file_rel_path);
 			continue;
-		} else if (S_ISDIR(buf.st_mode)) {
+		}
+		char *file_rel_path = ft_strjoin(dir_slashed_path, dir->d_name);
+		struct file *file = file_constructor(dir->d_name, file_rel_path);
+		if (S_ISDIR(file->stat.st_mode)) {
 			dirs_path[nbr_dirs++] = ft_strdup(file_rel_path);
 		}
-		ft_printf("%s ", dir->d_name);
+		print_file(file);
 		free(file_rel_path);
 	}
 	ft_printf("\n");
