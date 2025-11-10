@@ -2,6 +2,7 @@
 #include "ft_ls.h"
 
 struct options options;
+t_list *list = NULL;
 
 struct file *file_constructor(const char *file_name, const char *file_rel_path) {
 	struct file *file = ft_calloc(1, sizeof(struct file));
@@ -13,6 +14,13 @@ struct file *file_constructor(const char *file_name, const char *file_rel_path) 
 
 void print_file(struct file *file) {
 	ft_printf("%s ", file->name);
+}
+
+void print_dir() {
+	while (list != NULL) {
+		print_file((struct file *)list->content);
+		list = list->next;
+	}
 }
 
 int parser_options(char *option) {
@@ -50,6 +58,7 @@ int ft_ls(char *dir_pathname) {
 
 	int nbr_dirs = 0;
 	char *dir_slashed_path = ft_strjoin(dir_pathname, "/");
+	t_list *node;
 	while ((dir = readdir(dirp)) != NULL) {
 		if (options.all == false && dir->d_name[0] == '.') {
 			continue;
@@ -59,10 +68,12 @@ int ft_ls(char *dir_pathname) {
 		if (S_ISDIR(file->stat.st_mode)) {
 			dirs_path[nbr_dirs++] = ft_strdup(file_rel_path);
 		}
-		print_file(file);
+		node = ft_lstnew(file);
+		ft_lstadd_back(&list, node);
 		free(file_rel_path);
 	}
-	ft_printf("\n");
+
+	print_dir();
 
 	#if DEBUG
 	ft_printf("Closing Dir\n");
