@@ -1,5 +1,7 @@
 #include "ft_ls.h"
 #include "libft.h"
+#include <string.h>
+#include <limits.h>
 
 struct options options;
 t_list *lst = NULL;
@@ -52,9 +54,15 @@ int parser_options(char *option) {
 	return (0);
 }
 
+void strjoin_stack(char *dest, char *str1, char *str2) {
+	ft_memcpy(dest, str1, ft_strlen(str1));
+	ft_memcpy(dest, str2, ft_strlen(str2));
+}
+
 int ft_ls(char *dir_pathname) {
 	DIR *dirp;
 	char *dirs_path[50] = {0};
+	char file_rel_path[PATH_MAX]
 	struct dirent *dir = NULL;
 
 	dirp = opendir(dir_pathname);
@@ -64,14 +72,15 @@ int ft_ls(char *dir_pathname) {
 	}
 
 	ft_printf("%s:\n", dir_pathname);
+	strjoin_stack(dir_slashed_path, dir_pathname, "\\");
 
 	int nbr_dirs = 0;
-	char *dir_slashed_path = ft_strjoin(dir_pathname, "/");
 	t_list *node = lst;
 	while ((dir = readdir(dirp)) != NULL) {
 		if (options.all == false && dir->d_name[0] == '.') {
 			continue;
 		}
+		strjoin_stack(file_rel_path, str, char *str2)
 		char *file_rel_path = ft_strjoin(dir_slashed_path, dir->d_name);
 		struct file *file = file_constructor(dir->d_name, file_rel_path);
 		if (S_ISDIR(file->stat.st_mode)) {
@@ -100,7 +109,6 @@ int ft_ls(char *dir_pathname) {
 	}
 #endif
 	closedir(dirp);
-	free(dir_slashed_path);
 	ft_printf("\n");
 
 	if (options.recursive == true) {
