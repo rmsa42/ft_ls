@@ -3,8 +3,25 @@
 #include <string.h>
 #include <limits.h>
 
+int cmp_normal(const char *str1, const char *str2);
+
 struct options options;
 t_list *lst = NULL;
+int (*cmp)(const char *, const char *) = cmp_normal;
+
+int cmp_normal(const char *str1, const char *str2) {
+	if (ft_strcmp(str1, str2) > 0) {
+		return (1);
+	}
+	return (0);
+}
+
+int cmp_reverse(const char *str1, const char *str2) {
+	if (ft_strcmp(str1, str2) < 0) {
+		return (1);
+	}
+	return (0);
+}
 
 struct file *file_constructor(const char *file_name,
 							  const char *file_rel_path) {
@@ -15,11 +32,11 @@ struct file *file_constructor(const char *file_name,
 	return (file);
 }
 
-void print_dir() {
+void print_dir(const size_t filenbr) {
 	t_list *tmp = lst;
 	struct file *file;
 
-	while (tmp != NULL) {
+	for (size_t i = 0; i < filenbr; i++) {
 		file = (struct file *)tmp->content;
 		if (options.long_list == true) {
 			ft_printf("%d ", file->stat.st_mode);
@@ -29,6 +46,7 @@ void print_dir() {
 		ft_printf("%s ", file->name);
 		tmp = tmp->next;
 	}
+	ft_printf("\n");
 }
 
 int parser_options(char *option) {
@@ -38,6 +56,7 @@ int parser_options(char *option) {
 			options.all = true;
 			break;
 		case 'r':
+			cmp = cmp_reverse;
 			options.reverse = true;
 			break;
 		case 'R':
@@ -54,34 +73,63 @@ int parser_options(char *option) {
 	return (0);
 }
 
-void strjoin_stack(char *dest, char *str1, char *str2) {
-	ft_memcpy(dest, str1, ft_strlen(str1));
-	ft_memcpy(dest, str2, ft_strlen(str2));
+void swap_node(t_list *node1, t_list *node2) {
+	void *tmp = node1->content;
+
+	node1->content = node2->content;
+	node2->content = tmp;
 }
 
-int ft_ls(char *dir_pathname) {
-	DIR *dirp;
-	char *dirs_path[50] = {0};
-	char file_rel_path[PATH_MAX]
-	struct dirent *dir = NULL;
+void sort_files(const size_t filenbr) {
+	t_list *curr = lst;
 
-	dirp = opendir(dir_pathname);
+	if (curr == NULL) {
+		return ;
+	}
+	for (size_t i = 0; i < filenbr; i++) {
+		t_list *tmp = curr;
+		for (size_t k = i; k < filenbr; k++) {
+			const struct file *file = (struct file *)tmp->content;
+			const struct file *curr_file = (struct file *)curr->content;
+			if (cmp(curr_file->name, file->name)) {
+				swap_node(curr, tmp);
+			}
+			tmp = tmp->next;
+		}
+		curr = curr->next;
+	}
+}
+
+void rel_path(char *dest, char *dir_path, char *file_name) {
+	size_t dir_len = ft_strlen(dir_path);
+
+	ft_strlcpy(dest, dir_path, dir_len);
+	ft_strlcpy(dest + dir_len, "/", 1);
+	ft_strlcpy(dest + dir_len + 1, file_name, ft_strlen(file_name));
+}
+
+int ft_ls(char *dir_path) {
+	DIR *dirp;
+	char *dirs_path[200] = {0};
+	char file_rel_path[PATH_MAX];
+	struct dirent *dir = NULL;
+	size_t filenbr = 0;
+	int nbr_dirs = 0;
+	t_list *node = lst;
+
+	dirp = opendir(dir_path);
 	if (dirp == NULL) {
-		perror(dir_pathname);
+		perror(dir_path);
 		return (1);
 	}
 
-	ft_printf("%s:\n", dir_pathname);
-	strjoin_stack(dir_slashed_path, dir_pathname, "\\");
+	ft_printf("%s:\n", dir_path);
 
-	int nbr_dirs = 0;
-	t_list *node = lst;
 	while ((dir = readdir(dirp)) != NULL) {
 		if (options.all == false && dir->d_name[0] == '.') {
 			continue;
 		}
-		strjoin_stack(file_rel_path, str, char *str2)
-		char *file_rel_path = ft_strjoin(dir_slashed_path, dir->d_name);
+		rel_path(file_rel_path, dir_path, dir->d_name);
 		struct file *file = file_constructor(dir->d_name, file_rel_path);
 		if (S_ISDIR(file->stat.st_mode)) {
 			dirs_path[nbr_dirs++] = ft_strdup(file_rel_path);
@@ -91,25 +139,24 @@ int ft_ls(char *dir_pathname) {
 			ft_lstadd_back(&lst, node);
 		} else {
 			free(node->content);
-			ft_printf("NO MALLOC\n");
 			node->content = (void *)file;
 		}
+		filenbr++;
 		node = node->next;
-		free(file_rel_path);
 	}
 
-	print_dir();
+	sort_files(filenbr);
+	print_dir(filenbr);
 
 #if DEBUG
 	ft_printf("Closing Dir\n");
 	ft_printf("Nbr of dirs: %d\n", nbr_dirs);
-	ft_printf("More Dirs: ");
+	ft_printf("\tMore Dirs: ");
 	for (int i = 0; i < nbr_dirs; i++) {
-		ft_printf("%s\n", dirs_path[i]);
+		ft_printf("%s ", dirs_path[i]);
 	}
 #endif
 	closedir(dirp);
-	ft_printf("\n");
 
 	if (options.recursive == true) {
 		ft_printf("\n");
@@ -146,13 +193,21 @@ int main(int argc, char **argv) {
 #if DEBUG
 	ft_printf("DEBUG Log\n");
 	ft_printf("  Active Options:\n");
-	ft_printf("\tall: %d\n\treverse: %d\n\trecursive: %d\n", options.all,
-			  options.reverse, options.recursive);
+	ft_printf("\tall: %d\n\treverse: %d\n\trecursive: %d\n\tlong_list: %d\n", options.all,
+			  options.reverse, options.recursive, options.long_list);
 	ft_printf("Finish DEBUG\n\n");
 #endif
 
+	int ret;
 	for (int i = 0; i < nbr_dirs; i++) {
-		ft_ls(dir_paths[i]);
+		ret = ft_ls(dir_paths[i]);
 	}
-	return (0);
+
+	while (lst != NULL) {
+		t_list *tmp = lst;
+		lst = lst->next;
+		free(tmp->content);
+		free(tmp);
+	}
+	return (ret);
 }

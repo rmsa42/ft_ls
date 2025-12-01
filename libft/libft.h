@@ -85,7 +85,7 @@ char	*get_next_line(int fd);
 char	*ft_strjoin_get(char *s1, char *s2);
 char	*ft_strchr_get(const char *str, int c);
 void	ft_free_dp(void **arg);
-int		ft_strcmp(char *str1, char *str2);
+int		ft_strcmp(const char *str1, const char *str2);
 
 //ft_fprintf
 int		ft_fprintf(int fd, const char *format, ...);
