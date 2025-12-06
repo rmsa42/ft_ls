@@ -17,7 +17,7 @@ struct file *file_constructor(const char *file_name,
 	struct file *file = ft_calloc(1, sizeof(struct file));
 
 	file->name = file_name;
-	stat(file_rel_path, &file->stat);
+	lstat(file_rel_path, &file->stat);
 	return (file);
 }
 
@@ -29,6 +29,7 @@ void print_dir_l(const size_t filenbr) {
 	for (size_t i = 0; i < filenbr; i++) {
 		file = (struct file *)tmp->content;
 		print_mode(file->stat.st_mode);
+		print_hardlinks(file->stat.st_nlink);
 		print_user(file->stat.st_uid);
 		print_group(file->stat.st_gid);
 		print_size(file->stat.st_size);

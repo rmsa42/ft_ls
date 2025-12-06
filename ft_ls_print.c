@@ -41,6 +41,9 @@ void print_mode(mode_t mode) {
 		case S_IFDIR:
 			buf[k] = 'd';
 			break;
+		case S_IFLNK:
+			buf[k] = 'l';
+			break;
 		default:
 			buf[k] = '?';
 	}
@@ -62,5 +65,9 @@ void print_mode(mode_t mode) {
 	}
 	buf[10] = '\0';
 	ft_printf("%s ", buf);
+}
+
+void print_hardlinks(nlink_t nbrlink) {
+	ft_printf("%d ", nbrlink);
 }
 

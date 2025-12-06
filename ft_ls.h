@@ -29,5 +29,6 @@ void print_user(uid_t uid);
 void print_time(struct stat *stat);
 void print_size(off_t size);
 void print_mode(mode_t mode);
+void print_hardlinks(nlink_t nbrlink);
 
 #endif
