@@ -3,6 +3,8 @@
 #include <pwd.h>
 #include <grp.h>
 #include <time.h>
+#include <stdint.h>
+#include <string.h>
 
 void print_name(const char *file_name) {
 	ft_printf("%s ", file_name);
@@ -28,5 +30,37 @@ void print_size(off_t size) {
 }
 
 void print_mode(mode_t mode) {
-	ft_printf("%d ", mode);
+	char buf[11];
+	int k = 0;
+
+	memset(buf, '-', sizeof(buf));
+	switch (mode & S_IFMT) {
+		case S_IFREG:
+			buf[k] = '-';
+			break;
+		case S_IFDIR:
+			buf[k] = 'd';
+			break;
+		default:
+			buf[k] = '?';
+	}
+	k++;
+	for (int i = 0 ; i < 3; i++) {
+		if (mode & S_IREAD) {
+			buf[k] = 'r';
+		}
+		k++;
+		if (mode & S_IWRITE) {
+			buf[k] = 'w';
+		}
+		k++;
+		if (mode & S_IEXEC) {
+			buf[k] = 'x';
+		}
+		k++;
+		mode = mode << 3;
+	}
+	buf[10] = '\0';
+	ft_printf("%s ", buf);
 }
+

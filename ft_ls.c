@@ -101,7 +101,7 @@ void sort_files(const size_t filenbr) {
 	}
 }
 
-void rel_path(char *dest, char *dir_path, char *file_name) {
+void get_rel_path(char *dest, char *dir_path, char *file_name) {
 	size_t dir_len = ft_strlen(dir_path);
 
 	ft_strlcpy(dest, dir_path, dir_len);
@@ -130,7 +130,7 @@ int ft_ls(char *dir_path) {
 		if (options.all == false && dir->d_name[0] == '.') {
 			continue;
 		}
-		rel_path(file_rel_path, dir_path, dir->d_name);
+		get_rel_path(file_rel_path, dir_path, dir->d_name);
 		struct file *file = file_constructor(dir->d_name, file_rel_path);
 		if (S_ISDIR(file->stat.st_mode)) {
 			dirs_path[nbr_dirs++] = ft_strdup(file_rel_path);
