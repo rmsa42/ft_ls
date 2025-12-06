@@ -18,4 +18,8 @@ struct file {
 	struct stat stat;
 };
 
+int cmp_reverse(const char *str1, const char *str2);
+int cmp_normal(const char *str1, const char *str2);
+char *stack_trim(char *str);
+
 #endif

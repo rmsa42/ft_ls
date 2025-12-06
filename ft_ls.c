@@ -2,26 +2,15 @@
 #include "libft.h"
 #include <string.h>
 #include <limits.h>
+#include <grp.h>
+#include <pwd.h>
+#include <time.h>
 
 int cmp_normal(const char *str1, const char *str2);
 
 struct options options;
 t_list *lst = NULL;
 int (*cmp)(const char *, const char *) = cmp_normal;
-
-int cmp_normal(const char *str1, const char *str2) {
-	if (ft_strcmp(str1, str2) > 0) {
-		return (1);
-	}
-	return (0);
-}
-
-int cmp_reverse(const char *str1, const char *str2) {
-	if (ft_strcmp(str1, str2) < 0) {
-		return (1);
-	}
-	return (0);
-}
 
 struct file *file_constructor(const char *file_name,
 							  const char *file_rel_path) {
@@ -32,17 +21,36 @@ struct file *file_constructor(const char *file_name,
 	return (file);
 }
 
+void print_dir_l(const size_t filenbr) {
+	t_list *tmp = lst;
+	struct file *file;
+	struct group *group;
+	struct passwd *passwd;
+	char *time;
+
+	ft_printf("total %d\n", filenbr);
+	for (size_t i = 0; i < filenbr; i++) {
+		file = (struct file *)tmp->content;
+		group = getgrgid(file->stat.st_gid);
+		passwd = getpwuid(file->stat.st_uid);
+		time = ctime((const time_t *)&file->stat.st_mtim);
+		ft_printf("%d ", file->stat.st_mode);
+		ft_printf("%s ", passwd->pw_name);
+		ft_printf("%s ", group->gr_name);
+		ft_printf("%d ", file->stat.st_size);
+		ft_printf("%s ", stack_trim(time));
+		ft_printf("%s\n", file->name);
+		tmp = tmp->next;
+	}
+	ft_printf("\n");
+}
+
 void print_dir(const size_t filenbr) {
 	t_list *tmp = lst;
 	struct file *file;
 
 	for (size_t i = 0; i < filenbr; i++) {
 		file = (struct file *)tmp->content;
-		if (options.long_list == true) {
-			ft_printf("%d ", file->stat.st_mode);
-			ft_printf("%d ", file->stat.st_gid);
-			ft_printf("%d ", file->stat.st_size);
-		}
 		ft_printf("%s ", file->name);
 		tmp = tmp->next;
 	}
@@ -146,7 +154,11 @@ int ft_ls(char *dir_path) {
 	}
 
 	sort_files(filenbr);
-	print_dir(filenbr);
+	if (options.long_list == true) {
+		print_dir_l(filenbr);
+	} else {
+		print_dir(filenbr);
+	}
 
 #if DEBUG
 	ft_printf("Closing Dir\n");
