@@ -1,7 +1,9 @@
 ft_ls
 *.o
 *.a
+TODO.txt
 
 # Clangd
 .cache/
 compile_commands.json
+

@@ -2,7 +2,7 @@ NAME = ft_ls
 
 LIBFT = libft
 
-SRC = ft_ls.c ft_ls_utils.c
+SRC = ft_ls.c ft_ls_utils.c ft_ls_print.c
 OBJ = $(SRC:.c=.o)
 CFLAGS = -Wextra -Wall -g
 INCLUDES = $(LIBFT)

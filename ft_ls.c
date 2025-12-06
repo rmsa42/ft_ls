@@ -24,25 +24,19 @@ struct file *file_constructor(const char *file_name,
 void print_dir_l(const size_t filenbr) {
 	t_list *tmp = lst;
 	struct file *file;
-	struct group *group;
-	struct passwd *passwd;
-	char *time;
 
 	ft_printf("total %d\n", filenbr);
 	for (size_t i = 0; i < filenbr; i++) {
 		file = (struct file *)tmp->content;
-		group = getgrgid(file->stat.st_gid);
-		passwd = getpwuid(file->stat.st_uid);
-		time = ctime((const time_t *)&file->stat.st_mtim);
-		ft_printf("%d ", file->stat.st_mode);
-		ft_printf("%s ", passwd->pw_name);
-		ft_printf("%s ", group->gr_name);
-		ft_printf("%d ", file->stat.st_size);
-		ft_printf("%s ", stack_trim(time));
-		ft_printf("%s\n", file->name);
+		print_mode(file->stat.st_mode);
+		print_user(file->stat.st_uid);
+		print_group(file->stat.st_gid);
+		print_size(file->stat.st_size);
+		print_time(&file->stat);
+		print_name(file->name);
+		ft_printf("\n");
 		tmp = tmp->next;
 	}
-	ft_printf("\n");
 }
 
 void print_dir(const size_t filenbr) {
@@ -51,10 +45,9 @@ void print_dir(const size_t filenbr) {
 
 	for (size_t i = 0; i < filenbr; i++) {
 		file = (struct file *)tmp->content;
-		ft_printf("%s ", file->name);
+		print_name(file->name);
 		tmp = tmp->next;
 	}
-	ft_printf("\n");
 }
 
 int parser_options(char *option) {
@@ -169,6 +162,7 @@ int ft_ls(char *dir_path) {
 	}
 #endif
 	closedir(dirp);
+	ft_printf("\n");
 
 	if (options.recursive == true) {
 		ft_printf("\n");

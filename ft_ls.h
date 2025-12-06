@@ -22,4 +22,12 @@ int cmp_reverse(const char *str1, const char *str2);
 int cmp_normal(const char *str1, const char *str2);
 char *stack_trim(char *str);
 
+// Print functions
+void print_name(const char *file_name);
+void print_group(gid_t gid);
+void print_user(uid_t uid);
+void print_time(struct stat *stat);
+void print_size(off_t size);
+void print_mode(mode_t mode);
+
 #endif
