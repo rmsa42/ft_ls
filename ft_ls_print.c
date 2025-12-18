@@ -22,7 +22,11 @@ void print_user(uid_t uid) {
 
 void print_time(struct stat *stat) {
 	char *time = ctime((const time_t *)&stat->st_mtim);
-	ft_printf("%s ", stack_trim(time) + 4);
+	char *new_time = stack_trim(time);
+
+	new_time += 4; // Don't print the day
+	new_time[12] = '\0'; // Don't print the seconds and year
+	ft_printf("%s ", new_time);
 }
 
 void print_size(off_t size) {
